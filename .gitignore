@@ -15,10 +15,8 @@ coverage/
 !.env.template
 /.aws/
 
-# Downloaded OSM data, Imposm binaries and import cache
+# Downloaded OSM data, Imposm import cache
 /geofabric/pbf/
-/geofabric/imposm/imposm
-/geofabric/imposm/lib/
 /geofabric/imposm/cache/
 
 # Local agent settings and editor files
