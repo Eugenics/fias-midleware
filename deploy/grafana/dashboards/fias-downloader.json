@@ -1,0 +1,113 @@
+{
+  "title": "FIAS Downloader — текущая загрузка",
+  "uid": "fias-downloader",
+  "schemaVersion": 39,
+  "version": 2,
+  "editable": true,
+  "timezone": "browser",
+  "refresh": "5s",
+  "time": { "from": "now-1h", "to": "now" },
+  "tags": ["fias-downloader"],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Активная загрузка",
+      "type": "stat",
+      "description": "Количество файлов, загружаемых сейчас.",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum(fias_download_in_progress)",
+          "legendFormat": "активно",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "none", "decimals": 0 }, "overrides": [] }
+    },
+    {
+      "id": 2,
+      "title": "Прогресс",
+      "type": "gauge",
+      "description": "Процент загрузки активного файла.",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "100 * fias_download_progress_downloaded_bytes / clamp_min(fias_download_progress_total_bytes, 1)",
+          "legendFormat": "{{kind}} v{{version_id}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "blue", "value": null },
+              { "color": "green", "value": 100 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3,
+      "title": "Загружено",
+      "type": "stat",
+      "description": "Объём уже полученных данных активного файла.",
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "fias_download_progress_downloaded_bytes",
+          "legendFormat": "{{kind}} v{{version_id}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "decbytes" }, "overrides": [] }
+    },
+    {
+      "id": 4,
+      "title": "Размер файла",
+      "type": "stat",
+      "description": "Ожидаемый полный размер активного файла.",
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "fias_download_progress_total_bytes",
+          "legendFormat": "{{kind}} v{{version_id}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "decbytes" }, "overrides": [] }
+    },
+    {
+      "id": 5,
+      "title": "Текущая загрузка во времени",
+      "type": "timeseries",
+      "description": "Метрики исчезают после завершения или ошибки загрузки.",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "fias_download_progress_downloaded_bytes",
+          "legendFormat": "загружено: {{kind}} v{{version_id}}",
+          "refId": "A"
+        },
+        {
+          "expr": "fias_download_progress_total_bytes",
+          "legendFormat": "всего: {{kind}} v{{version_id}}",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "decbytes" }, "overrides": [] }
+    }
+  ]
+}

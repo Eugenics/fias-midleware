@@ -1,0 +1,36 @@
+# Persistent service data and tile cache
+/var/
+
+# JavaScript dependencies and generated output
+node_modules/
+/web/dist/
+coverage/
+*.tsbuildinfo
+
+# Local environment and credentials (keep configuration templates)
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+/.aws/
+
+# Downloaded OSM data, Imposm binaries and import cache
+/geofabric/pbf/
+/geofabric/imposm/imposm
+/geofabric/imposm/lib/
+/geofabric/imposm/cache/
+
+# Local agent settings and editor files
+/.agents/
+/.codex/
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Runtime logs
+*.log

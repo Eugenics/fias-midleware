@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FIAS · Карты</title>
+  </head>
+  <body>
+    <aside>
+      <header><span class="badge">FIAS / GEOSERVER</span><h1>Карты и слои</h1><p>Исследуйте опубликованные геоданные</p></header>
+      <div class="toolbar"><input id="search" type="search" placeholder="Найти слой…" aria-label="Поиск слоёв"><button id="reload" title="Обновить список слоёв">Обновить</button></div>
+      <p id="status" role="status">Подключение к GeoServer…</p>
+      <div id="layers"></div>
+      <p class="map-hint">Включите слой и нажмите на объект, чтобы открыть информацию о нём.</p>
+      <footer>Слои отображаются в порядке включения: последний — сверху.</footer>
+    </aside>
+    <main><div id="map" tabindex="0" aria-label="Карта"></div><div class="map-label">FIAS <span>Картографический просмотр</span></div></main>
+    <dialog id="feature-dialog" aria-labelledby="feature-dialog-title">
+      <div class="dialog-header">
+        <h2 id="feature-dialog-title">Объекты на карте</h2>
+        <button id="close-feature-dialog" type="button" autofocus>Закрыть</button>
+      </div>
+      <div id="info" aria-live="polite" aria-atomic="true"></div>
+    </dialog>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

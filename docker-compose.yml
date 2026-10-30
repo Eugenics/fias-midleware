@@ -1,0 +1,78 @@
+services:
+  map-client:
+    build: ./web
+    restart: unless-stopped
+    ports:
+      - "${MAP_CLIENT_PORT:-8080}:80"
+    depends_on:
+      geoserver:
+        condition: service_started
+    networks:
+      - fias-geoserver-network
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+    volumes:
+      - ./deploy/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deploy/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - fias-downloader-network
+
+  geoserver:
+    image: docker.osgeo.org/geoserver:2.28.2
+    restart: unless-stopped
+    container_name: geoserver
+    environment:
+      INSTALL_EXTENSIONS: "true"
+      STABLE_EXTENSIONS: "css"
+      GEOWEBCACHE_CACHE_DIR: /opt/geoserver_blobstore
+    depends_on:
+      postgis:
+        condition: service_healthy
+    volumes:
+      - ./var/geoserver:/opt/geoserver_data:rw
+      - ./var/geoserver-blobstore:/opt/geoserver_blobstore:rw
+    ports:
+      - "8181:8080"
+    networks:
+      - fias-geoserver-network
+
+  postgis:
+    image: postgis/postgis:17-3.5
+    restart: unless-stopped
+    container_name: geoserver-postgis
+    environment:
+      POSTGRES_DB: geoserver
+      POSTGRES_USER: geoserver
+      POSTGRES_PASSWORD: ${POSTGIS_PASSWORD:-geoserver}
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgis-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U geoserver -d geoserver"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - fias-geoserver-network
+
+volumes:
+  grafana-data:
+  postgis-data:
+
+networks:
+  fias-downloader-network:
+    name: fias-downloader-network
+    external: true
+  fias-geoserver-network:
+    name: fias-geoserver-network
