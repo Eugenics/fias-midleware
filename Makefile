@@ -8,7 +8,7 @@ help:
 	@echo "  make compose-up      - docker compose up"
 	@echo "  make compose-down    - docker compose down"
 	@echo "  make compose-rebuild - docker compose down -v && up --build"
-	@echo "  make import-osm      - import OSM data into PostGIS"
+	@echo "  make import-osm      - import all geofabric/pbf/*.pbf files into PostGIS"
 
 compose-up:
 	docker compose up -d
@@ -27,4 +27,18 @@ compose-rebuild:
 	docker compose up --build
 
 import-osm:
-	cd geofabric/imposm && ./imposm import -mapping mapping.yml -read ../pbf/siberian-fed-district-261021.osm.pbf -write -connection postgis://geoserver:geoserver@localhost:5435/geoserver -deployproduction -overwritecache
+	@set -e; \
+	cd geofabric/imposm; \
+	shopt -s nullglob; \
+	files=(../pbf/*.pbf); \
+	if [ $${#files[@]} -eq 0 ]; then \
+		echo "No PBF files found in geofabric/pbf" >&2; \
+		exit 1; \
+	fi; \
+	cache_flag=-overwritecache; \
+	for file in "$${files[@]}"; do \
+		echo "Reading $$file"; \
+		./imposm import -mapping mapping.yml -read "$$file" "$$cache_flag"; \
+		cache_flag=-appendcache; \
+	done; \
+	./imposm import -mapping mapping.yml -write -connection postgis://geoserver:geoserver@localhost:5435/geoserver -deployproduction
